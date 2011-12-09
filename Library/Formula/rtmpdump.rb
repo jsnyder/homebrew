@@ -2,6 +2,7 @@ require 'formula'
 
 class Rtmpdump < Formula
   url 'http://rtmpdump.mplayerhq.hu/download/rtmpdump-2.3.tgz'
+  head 'git://git.ffmpeg.org/rtmpdump'
   homepage 'http://rtmpdump.mplayerhq.hu'
   md5 'eb961f31cd55f0acf5aad1a7b900ef59'
 
@@ -10,7 +11,7 @@ class Rtmpdump < Formula
   fails_with_llvm if MacOS.lion?
 
   # Use dylib instead of so
-  def patches; DATA; end
+  def patches; DATA; end if !ARGV.build_head?
 
   def install
     ENV.j1
@@ -18,7 +19,7 @@ class Rtmpdump < Formula
       s.change_make_var! "CC", ENV['CC']
       s.change_make_var! "LD", ENV['LD']
     end
-    system "make", "prefix=#{prefix}", "MANDIR=#{man}", "SYS=posix", "install"
+    system "make", "prefix=#{prefix}", "MANDIR=#{man}", "SYS=" + (ARGV.build_head? ? 'darwin' : 'posix'), "install"
   end
 end
 
